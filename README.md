@@ -7,17 +7,17 @@
 | JWT login                                     | POST        | /jwt/login                                     |
 | Session login                                 | POST        | /session/login                                 |
 | Session logout                                | POST        | /session/logout                                |
-| Create a customer                             | POST        | /customers/createCustomer                      |
-| Get a customer by ID                          | GET         | /admin/customers/getCustomerById               |
+| Create a customer                             | POST        | /customers                                     |
+| Get a customer by ID                          | GET         | /admin/customers/:customerId                   |
 | List customers with pagination                | GET         | /admin/customers/listCustomers                 |
-| Update a customer                             | POST        | /admin/customers/updateCustomer                |
-| Delete a customer                             | POST        | /admin/customers/deleteCustomer                |
-| Create a category                             | POST        | /admin/categories/createCategory               |
-| Get a category by slug                        | GET         | /categories/getCategoryBySlug                  |
+| Update a customer                             | POST        | /admin/customers/:customerId                   |
+| Delete a customer                             | POST        | /admin/customers/:customerId/delete            |
+| Create a category                             | POST        | /admin/categories/                             |
+| Get a category by slug                        | GET         | /categories/:categorySlug                      |
 | List categories with pagination               | GET         | /categories/listCategories                     |
-| List categories in admin with pagination      | GET         | /admin/categories/listCategories               |
-| Update a category                             | POST        | /admin/categories/updateCategory               |
-| Delete a category                             | POST        | /admin/categories/deleteCategory               |
+| List categories in admin with pagination      | GET         | /admin/categories/                             |
+| Update a category                             | POST        | /admin/categories/:categoryId                  |
+| Delete a category                             | POST        | /admin/categories/:categoryId/delete           |
 | Create a product                              | POST        | /admin/products/createProduct                  |
 | Get a product by ID                           | GET         | /admin/products/getProductById                 |
 | Get a product by slug                         | GET         | /products/getProductBySlug                     |
