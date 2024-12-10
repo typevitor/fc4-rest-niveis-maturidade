@@ -17,7 +17,7 @@ router.get('/:customerId', async (req, res) => {
     //res.json(customer);
 });
 
-router.post('/:customerId', async (req, res) => {
+router.patch('/:customerId', async (req, res) => {
     const customerService = await createCustomerService();
     const { phone, address, password } = req.body;
     const customer = await customerService.updateCustomer({
@@ -29,7 +29,7 @@ router.post('/:customerId', async (req, res) => {
     res.json(customer);
 });
 
-router.post('/:customerId/delete', async (req, res) => {
+router.delete('/:customerId', async (req, res) => {
     const customerService = await createCustomerService();
     const { customerId } = req.params;
     await customerService.deleteCustomer(parseInt(customerId));
