@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createCategoryService } from '../../services/category.service';
+import { Resource, ResourceCollection } from '../../http/Resource';
 
 const router = Router();
 
@@ -7,20 +8,23 @@ router.post('/', async (req, res) => {
     const categoryService = await createCategoryService();
     const { name, slug } = req.body;
     const category = await categoryService.createCategory({ name, slug });
-    res.json(category);
+    const resource = new Resource(category);
+    res.json(resource);
 });
 
 router.get('/:categoryId', async (req, res) => {
     const categoryService = await createCategoryService();
     const category = await categoryService.getCategoryById(+req.params.categoryId);
-    res.json(category);
+    const resource = new Resource(category);
+    res.json(resource);
 });
 
 router.patch('/:categoryId', async (req, res) => {
     const categoryService = await createCategoryService();
-    const { id, name, slug } = req.body;
+    const { name, slug } = req.body;
     const category = await categoryService.updateCategory({ id: +req.params.categoryId, name, slug });
-    res.json(category);
+    const resource = new Resource(category);
+    res.json(resource);
 });
 
 router.delete('/:categoryId', async (req, res) => {
@@ -38,7 +42,14 @@ router.get('/', async (req, res) => {
         limit: parseInt(limit as string),
         filter: { name: name as string }
     });
-    res.json({ categories, total });
+    const resource = new ResourceCollection(categories, {
+        paginationData: {
+            total,
+            page: parseInt(page as string),
+            limit: parseInt(limit as string),
+        },
+    });
+    res.json(resource.toJson());
 });
 
 export default router;

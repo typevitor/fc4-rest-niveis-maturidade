@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createCustomerService } from "../services/customer.service";
 import { CreateCustomerDto } from "../validations/customer.validations";
 import { validateSync } from "class-validator";
+import { Resource } from "../http/Resource";
 
 const router = Router();
 
@@ -23,7 +24,8 @@ router.post("/", async (req, res) => {
       phone,
       address,
     });
-    res.json(customer);
+    const resource = new Resource(customer)
+    res.json(resource.toJson());
   } catch (e) {
     return res.send((e as any).message);
   }

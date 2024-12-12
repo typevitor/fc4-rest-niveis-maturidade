@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createCustomerService } from '../../services/customer.service';
+import { Resource, ResourceCollection } from '../../http/Resource';
 
 const router = Router();
 
@@ -7,14 +8,18 @@ router.post('/', async (req, res) => {
     const customerService = await createCustomerService();
     const { name, email, password, phone, address } = req.body;
     const customer = await customerService.registerCustomer({name, email, password, phone, address});
-    res.json(customer);
+    const resource = new Resource(customer)
+    res.json(resource.toJson());
 });
 
 router.get('/:customerId', async (req, res) => {
     const customerService = await createCustomerService();
     const customer = await customerService.getCustomer(+req.params.customerId);
-    res.send(customer ? customer : {message: 'Customer not found'});
-    //res.json(customer);
+    if(customer) {
+        const resource = new Resource(customer)
+        res.json(resource.toJson());
+    }
+    res.send('Customer not found');
 });
 
 router.patch('/:customerId', async (req, res) => {
@@ -26,7 +31,8 @@ router.patch('/:customerId', async (req, res) => {
         address,
         password
     });
-    res.json(customer);
+    const resource = new Resource(customer)
+    res.json(resource.toJson());
 });
 
 router.delete('/:customerId', async (req, res) => {
@@ -43,7 +49,14 @@ router.get('/', async (req, res) => {
         page: parseInt(page as string),
         limit: parseInt(limit as string)
     });
-    res.json({ customers, total });
+    const resource = new ResourceCollection(customers, {
+        paginationData: {
+            total,
+            page: parseInt(page as string),
+            limit: parseInt(limit as string),
+        },
+    })
+    res.json(resource.toJson());
 });
 
 export default router;

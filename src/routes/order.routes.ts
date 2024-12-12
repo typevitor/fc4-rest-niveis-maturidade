@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createOrderService } from '../services/order.service';
+import { Resource, ResourceCollection } from '../http/Resource';
 
 const router = Router();
 
@@ -9,7 +10,8 @@ router.post('/', async (req, res) => {
     // @ts-expect-error
     const customerId = req.userId;
     const { order, payment } = await orderService.createOrder({customerId, payment_method, card_token, cart_uuid});
-    res.json({ order, payment });
+    const resource = new Resource({order, payment});
+    res.json(resource);
 });
 
 router.get('/', async (req, res) => {
@@ -22,8 +24,15 @@ router.get('/', async (req, res) => {
         limit: parseInt(limit as string),
         customerId
     });
-    res.json({ orders, total });
-});
+    
+    const resource = new ResourceCollection(orders, {
+        paginationData: {
+            total,
+            page: parseInt(page as string),
+            limit: parseInt(limit as string),
+        },
+    })
+    res.json(resource.toJson());});
 
 
 export default router;

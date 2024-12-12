@@ -43,7 +43,7 @@ Content-Type: application/json
 
 ###
 
-@customer_id = {{ createCustomer.response.body.id }}
+@customer_id = {{ createCustomer.response.body.data.id }}
 
 ### Get a customer by ID
 GET http://localhost:3000/admin/customers/{{ customer_id }}
@@ -83,8 +83,8 @@ Authorization: Bearer {{ token }}
 }
 
 ###
-@category_id = {{ createCategory.response.body.id }}
-@category_slug = {{ createCategory.response.body.slug }}
+@category_id = {{ createCategory.response.body.data.id }}
+@category_slug = {{ createCategory.response.body.data.slug }}
 
 ### Get a category by ID
 GET http://localhost:3000/categories/{{ category_slug }}
@@ -127,8 +127,8 @@ Authorization: Bearer {{ token }}
 }
 
 ###
-@product_id = {{ createProduct.response.body.id }}
-@product_slug = {{ createProduct.response.body.slug }}
+@product_id = {{ createProduct.response.body.data.id }}
+@product_slug = {{ createProduct.response.body.data.slug }}
 
 ### Get a product by ID
 GET http://localhost:3000/admin/products/{{ product_id }}
@@ -175,7 +175,7 @@ POST http://localhost:3000/carts
 Content-Type: application/json
 
 ###
-@cart_uuid = {{ createCart.response.body.uuid }}
+@cart_uuid = {{ createCart.response.body.data.uuid }}
 
 
 ### Add an item to the cart "customerId": "{{ customer_id }}",

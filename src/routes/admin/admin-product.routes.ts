@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createProductService } from "../../services/product.service";
+import { Resource, ResourceCollection } from "../../http/Resource";
 
 const router = Router();
 
@@ -40,16 +41,16 @@ router.post("/", async (req, res) => {
     price,
     categoryIds
   );
-  res.json(product);
-});
+  const resource = new Resource(product);
+  res.json(resource);});
 
 router.get("/:productId", async (req, res) => {
   const productService = await createProductService();
   const product = await productService.getProductById(
     +req.params.productId
   );
-  res.json(product);
-});
+  const resource = new Resource(product);
+  res.json(resource);});
 
 router.patch("/:productId", async (req, res) => {
   const productService = await createProductService();
@@ -62,8 +63,8 @@ router.patch("/:productId", async (req, res) => {
     price,
     categoryIds,
   });
-  res.json(product);
-});
+  const resource = new Resource(product);
+  res.json(resource);});
 
 router.delete("/:productId", async (req, res) => {
   const productService = await createProductService();
@@ -90,7 +91,14 @@ router.get("/", async (req, res) => {
       categories_slug,
     },
   });
-  res.json({ products, total });
+  const resource = new ResourceCollection(products, {
+    paginationData: {
+        total,
+        page: parseInt(page as string),
+        limit: parseInt(limit as string),
+      },
+  })
+  res.json(resource.toJson());
 });
 
 export default router;
