@@ -1,4 +1,5 @@
 import express from "express";
+import { Request, Response, NextFunction } from 'express';
 import { createDatabaseConnection } from "./database";
 import customerRoutes from "./routes/customer.routes";
 import categoryRoutes from "./routes/category.routes";
@@ -13,6 +14,8 @@ import jwtAuthRoutes from "./routes/jwt-auth.routes";
 import { createCustomerService } from "./services/customer.service";
 //import session from "express-session";
 import jwt from "jsonwebtoken";
+import { ValidationError } from "./errors";
+import { UserAlreadyExistsError } from "./errors/UserAlreadyExistsError";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -52,7 +55,7 @@ app.use(async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-      return res.status(200).send({message: "Unauthorized"});
+      return res.status(401).send({message: "Unauthorized"});
     }
 
     const token = authHeader.split(" ")[1];
@@ -62,7 +65,7 @@ app.use(async (req, res, next) => {
       //@ts-expect-error
       req.userId = decoded.sub;
     } catch (e) {
-      return res.status(200).send({message: "Unauthorized"});
+      return res.status(401).send({message: "Unauthorized"});
     }
   }
 
@@ -83,6 +86,48 @@ app.use("/admin/categories", adminCategoryRoutes);
 app.get("/", async (req, res) => {
   await createDatabaseConnection();
   res.send("Hello World!");
+});
+
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  if (!(error instanceof Error)) {
+    return next(error);
+  }
+  console.error(error);
+
+  if (error instanceof SyntaxError) {
+    return res.status(400).send({
+      title: "Bad Request",
+      status: 400,
+      detail: error.message,
+    });
+  }
+
+  if (error instanceof UserAlreadyExistsError) {
+    return res.status(409).send({
+      title: "Conflict",
+      status: 409,
+      detail: error.message,
+    });
+  }
+
+  if (error instanceof ValidationError) {
+    return res.status(422).send({
+      title: "Unprocessable Entity",
+      status: 422,
+      detail: {
+        errors: error.error.map((e) => ({
+          field: e.property,
+          constraints: e.constraints,
+        })),
+      },
+    });
+  }
+
+  res.status(500).send({
+    title: "Internal Server Error",
+    status: 500,
+    detail: "An unexpected error occurred",
+  });
 });
 
 app.listen(PORT, async () => {

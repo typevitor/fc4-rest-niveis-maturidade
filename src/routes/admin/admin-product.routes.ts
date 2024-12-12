@@ -31,24 +31,37 @@ router.get("/listProducts.csv", async (req, res) => {
   res.send(csv);
 });
 
-router.post("/", async (req, res) => {
-  const productService = await createProductService();
-  const { name, slug, description, price, categoryIds } = req.body;
-  const product = await productService.createProduct(
-    name,
-    slug,
-    description,
-    price,
-    categoryIds
-  );
-  const resource = new Resource(product);
-  res.json(resource);});
+router.post("/", async (req, res, next) => {
+  try {
+    const productService = await createProductService();
+    const { name, slug, description, price, categoryIds } = req.body;
+    const product = await productService.createProduct(
+      name,
+      slug,
+      description,
+      price,
+      categoryIds
+    );
+    res.set('Location', `/admin/products/${product.id}`).status(201);
+    const resource = new Resource(product);
+    res.json(resource);
+  }catch (e) {
+    next(e);
+  }
+});
 
 router.get("/:productId", async (req, res) => {
   const productService = await createProductService();
   const product = await productService.getProductById(
     +req.params.productId
   );
+  if(!product){
+    return res.status(404).json({
+      title: 'Not Found',
+      status: 404,
+      detail: `Product with id ${req.params.productId} not found`
+    });
+  }
   const resource = new Resource(product);
   res.json(resource);});
 
@@ -69,7 +82,7 @@ router.patch("/:productId", async (req, res) => {
 router.delete("/:productId", async (req, res) => {
   const productService = await createProductService();
   await productService.deleteProduct(+req.params.productId);
-  res.send({ message: "Product deleted successfully" });
+  res.sendStatus(204);
 });
 
 router.get("/", async (req, res) => {

@@ -2,6 +2,7 @@ import { Repository } from "typeorm";
 import { Customer } from "../entities/Customer";
 import { User } from "../entities/User";
 import { createDatabaseConnection } from "../database";
+import { UserAlreadyExistsError } from "../errors/UserAlreadyExistsError"
 
 export class CustomerService {
   constructor(private customerRepository: Repository<Customer>,private userRepository: Repository<User>) {}
@@ -19,7 +20,7 @@ export class CustomerService {
     const userExists = await this.userRepository.findOne({ where: { email } });
 
     if (userExists) {
-      throw new Error("User already exists");
+      throw new UserAlreadyExistsError("User already exists");
     }
 
     // Create a new user

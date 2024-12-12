@@ -8,6 +8,7 @@ router.post('/', async (req, res) => {
     const categoryService = await createCategoryService();
     const { name, slug } = req.body;
     const category = await categoryService.createCategory({ name, slug });
+    res.set('Location', `/admin/products/${category.id}`).status(201);
     const resource = new Resource(category);
     res.json(resource);
 });
@@ -15,6 +16,13 @@ router.post('/', async (req, res) => {
 router.get('/:categoryId', async (req, res) => {
     const categoryService = await createCategoryService();
     const category = await categoryService.getCategoryById(+req.params.categoryId);
+    if (!category) {
+        return res.status(404).json({
+            title: 'Not Found',
+            status: 404,
+            detail: `Category with id ${req.params.categoryId} not found`
+        });
+    }
     const resource = new Resource(category);
     res.json(resource);
 });
@@ -29,7 +37,6 @@ router.patch('/:categoryId', async (req, res) => {
 
 router.delete('/:categoryId', async (req, res) => {
     const categoryService = await createCategoryService();
-    const { id } = req.body;
     await categoryService.deleteCategory(+req.params.categoryId);
     res.sendStatus(204);
 });

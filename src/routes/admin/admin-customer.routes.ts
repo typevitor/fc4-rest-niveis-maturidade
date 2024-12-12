@@ -8,6 +8,7 @@ router.post('/', async (req, res) => {
     const customerService = await createCustomerService();
     const { name, email, password, phone, address } = req.body;
     const customer = await customerService.registerCustomer({name, email, password, phone, address});
+    res.set('Location', `/admin/products/${customer.id}`).status(201);
     const resource = new Resource(customer)
     res.json(resource.toJson());
 });
@@ -19,7 +20,11 @@ router.get('/:customerId', async (req, res) => {
         const resource = new Resource(customer)
         res.json(resource.toJson());
     }
-    res.send('Customer not found');
+    return res.status(404).json({
+      title: 'Not Found',
+      status: 404,
+      detail: `Customer with id ${req.params.customerId} not found`
+    });
 });
 
 router.patch('/:customerId', async (req, res) => {
@@ -39,7 +44,7 @@ router.delete('/:customerId', async (req, res) => {
     const customerService = await createCustomerService();
     const { customerId } = req.params;
     await customerService.deleteCustomer(parseInt(customerId));
-    res.send({message: 'Customer deleted successfully'});
+    res.sendStatus(204);
 });
 
 router.get('/', async (req, res) => {
