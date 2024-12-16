@@ -4,33 +4,6 @@ import { Resource, ResourceCollection } from "../../http/Resource";
 
 const router = Router();
 
-router.get("/listProducts.csv", async (req, res) => {
-  const productService = await createProductService();
-  const {
-    page = 1,
-    limit = 10,
-    name,
-    categories_slug: categoriesSlugStr,
-  } = req.query;
-  const categories_slug = categoriesSlugStr
-    ? categoriesSlugStr.toString().split(",")
-    : [];
-  const { products } = await productService.listProducts({
-    page: parseInt(page as string),
-    limit: parseInt(limit as string),
-    filter: {
-      name: name as string,
-      categories_slug,
-    },
-  });
-  const csv = products
-    .map((product) => {
-      return `${product.name},${product.slug},${product.description},${product.price}`;
-    })
-    .join("\n");
-  res.send(csv);
-});
-
 router.post("/", async (req, res, next) => {
   try {
     const productService = await createProductService();
@@ -93,25 +66,37 @@ router.get("/", async (req, res) => {
     name,
     categories_slug: categoriesSlugStr,
   } = req.query;
-  const categories_slug = categoriesSlugStr
-    ? categoriesSlugStr.toString().split(",")
-    : [];
-  const { products, total } = await productService.listProducts({
-    page: parseInt(page as string),
-    limit: parseInt(limit as string),
-    filter: {
-      name: name as string,
-      categories_slug,
-    },
-  });
-  const resource = new ResourceCollection(products, {
-    paginationData: {
-        total,
-        page: parseInt(page as string),
-        limit: parseInt(limit as string),
+    
+    const categories_slug = categoriesSlugStr
+      ? categoriesSlugStr.toString().split(",")
+      : [];
+    const { products, total } = await productService.listProducts({
+      page: parseInt(page as string),
+      limit: parseInt(limit as string),
+      filter: {
+        name: name as string,
+        categories_slug,
       },
-  })
-  res.json(resource.toJson());
+    });
+  
+    if(!req.headers['accept'] || req.headers['accept'] === 'application/json') {
+      const resource = new ResourceCollection(products, {
+        paginationData: {
+            total,
+            page: parseInt(page as string),
+            limit: parseInt(limit as string),
+          },
+      })
+      res.json(resource.toJson());
+    }
+  if(req.headers['accept'] === 'text/csv') {
+    const csv = products.map((product) => {
+      return `${product.name},${product.slug},${product.description},${product.price}`;
+    })
+    .join("\n");
+    res.set("Content-Type", "text/csv");
+    return res.send(csv);
+  }
 });
 
 export default router;
