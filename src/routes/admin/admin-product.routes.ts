@@ -1,10 +1,23 @@
 import { Router } from "express";
 import { createProductService } from "../../services/product.service";
 import { Resource, ResourceCollection } from "../../http/Resource";
+import cors from "cors";
+import { defaultCorsOptions } from "../../http/cors";
 
 const router = Router();
 
-router.post("/", async (req, res, next) => {
+const corsCollection = cors({
+  ...defaultCorsOptions,
+  methods: ["GET", "POST"],
+});
+
+const corsItem = cors({
+  ...defaultCorsOptions,
+  methods: ["GET", "PATCH", "DELETE"],
+});
+
+
+router.post("/", corsCollection, async (req, res, next) => {
   try {
     const productService = await createProductService();
     const { name, slug, description, price, categoryIds } = req.body;
@@ -23,7 +36,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.get("/:productId", async (req, res) => {
+router.get("/:productId", corsItem, async (req, res) => {
   const productService = await createProductService();
   const product = await productService.getProductById(
     +req.params.productId
@@ -38,7 +51,7 @@ router.get("/:productId", async (req, res) => {
   const resource = new Resource(product);
   res.json(resource);});
 
-router.patch("/:productId", async (req, res) => {
+router.patch("/:productId", corsItem, async (req, res) => {
   const productService = await createProductService();
   const { name, slug, description, price, categoryIds } = req.body;
   const product = await productService.updateProduct({
@@ -52,7 +65,7 @@ router.patch("/:productId", async (req, res) => {
   const resource = new Resource(product);
   res.json(resource);});
 
-router.delete("/:productId", async (req, res) => {
+router.delete("/:productId", corsItem, async (req, res) => {
   const productService = await createProductService();
   await productService.deleteProduct(+req.params.productId);
   res.sendStatus(204);
@@ -98,5 +111,8 @@ router.get("/", async (req, res) => {
     return res.send(csv);
   }
 });
+
+router.options("/", corsCollection);
+router.options("/:productId", corsItem);
 
 export default router;

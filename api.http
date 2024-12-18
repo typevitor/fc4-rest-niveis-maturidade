@@ -3,6 +3,7 @@
 # @name jwt_login
 POST http://localhost:3000/jwt/login
 Content-Type: application/json
+Origin: http://localhost:3000
 
 {
   "email": "admin@user.com",
@@ -112,6 +113,13 @@ Content-Type: application/json
 Authorization: Bearer {{ token }}
 
 ### 👉👉👉 Product Endpoints 👈👈👈
+
+### Options Products
+OPTIONS  http://localhost:3000/admin/products/
+Content-Type: application/json
+Authorization: Bearer {{ token }}
+
+###
 
 # @name createProduct
 POST http://localhost:3000/admin/products/
