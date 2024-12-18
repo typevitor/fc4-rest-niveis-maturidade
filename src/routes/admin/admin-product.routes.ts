@@ -29,7 +29,26 @@ router.post("/", corsCollection, async (req, res, next) => {
       categoryIds
     );
     res.set('Location', `/admin/products/${product.id}`).status(201);
-    const resource = new Resource(product);
+    const resource = new Resource(product, {
+      _links: {
+        self: {
+          href: `/admin/products/${product.id}`,
+          method: 'GET',
+          type: 'application/json'
+        },
+        update: {
+          href: `/admin/products/${product.id}`,
+          method: 'PATCH',
+          type: 'application/json'
+        },
+        delete: {
+          href: `/admin/products/${product.id}`,
+          method: 'DELETE',
+          type: 'application/json'
+
+        }
+      }
+    });
     res.json(resource);
   }catch (e) {
     next(e);

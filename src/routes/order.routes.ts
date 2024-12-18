@@ -10,7 +10,20 @@ router.post('/', async (req, res) => {
     // @ts-expect-error
     const customerId = req.userId;
     const { order, payment } = await orderService.createOrder({customerId, payment_method, card_token, cart_uuid});
-    const resource = new Resource({order, payment});
+    const resource = new Resource({order, payment}, {
+    _links: {
+        self: {
+            href: `/orders/${order.id}`,
+            method: 'GET',
+            type: 'application/json'
+        },
+        cancel: {
+            href: `/orders/${order.id}/cancel`,
+            method: 'POST',
+            type: 'application/json'
+        },
+    }
+    });
     res.json(resource);
 });
 
