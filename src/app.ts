@@ -17,6 +17,7 @@ import jwt from "jsonwebtoken";
 import { ValidationError } from "./errors";
 import { UserAlreadyExistsError } from "./errors/UserAlreadyExistsError";
 import { defaultCorsOptions } from "./http/cors";
+import { IResource } from "./http/resource";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -220,6 +221,14 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     status: 500,
     detail: "An unexpected error occurred",
   });
+});
+
+app.use((result: IResource, req: Request, res: Response, next: NextFunction) => {
+  if('toJson' in result) {
+    return res.json(result.toJson());
+  }
+
+  next(result);
 });
 
 app.listen(PORT, async () => {

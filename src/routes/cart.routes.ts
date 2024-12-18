@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { createCartService } from "../services/cart.service";
-import { Resource } from "../http/Resource";
+import { Resource } from "../http/resource";
 
 const router = Router();
 

@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { createProductService } from "../../services/product.service";
-import { Resource, ResourceCollection } from "../../http/Resource";
 import cors from "cors";
 import { defaultCorsOptions } from "../../http/cors";
+import { ProductResource, ProductResourceCollection } from "../../http/product-resource";
 
 const router = Router();
 
@@ -17,7 +17,7 @@ const corsItem = cors({
 });
 
 
-router.post("/", corsCollection, async (req, res, next) => {
+router.post("/", corsItem, async (req, res, next) => {
   try {
     const productService = await createProductService();
     const { name, slug, description, price, categoryIds } = req.body;
@@ -29,27 +29,8 @@ router.post("/", corsCollection, async (req, res, next) => {
       categoryIds
     );
     res.set('Location', `/admin/products/${product.id}`).status(201);
-    const resource = new Resource(product, {
-      _links: {
-        self: {
-          href: `/admin/products/${product.id}`,
-          method: 'GET',
-          type: 'application/json'
-        },
-        update: {
-          href: `/admin/products/${product.id}`,
-          method: 'PATCH',
-          type: 'application/json'
-        },
-        delete: {
-          href: `/admin/products/${product.id}`,
-          method: 'DELETE',
-          type: 'application/json'
-
-        }
-      }
-    });
-    res.json(resource);
+    const resource = new ProductResource(product, req);
+    res.json(resource.toJson());
   }catch (e) {
     next(e);
   }
@@ -67,8 +48,9 @@ router.get("/:productId", corsItem, async (req, res) => {
       detail: `Product with id ${req.params.productId} not found`
     });
   }
-  const resource = new Resource(product);
-  res.json(resource);});
+  const resource = new ProductResource(product, req);
+  res.json(resource.toJson());
+});
 
 router.patch("/:productId", corsItem, async (req, res) => {
   const productService = await createProductService();
@@ -81,8 +63,10 @@ router.patch("/:productId", corsItem, async (req, res) => {
     price,
     categoryIds,
   });
-  const resource = new Resource(product);
-  res.json(resource);});
+  //@ts-expect-error
+  const resource = new ProductResource(product, req);
+  res.json(resource.toJson());
+});
 
 router.delete("/:productId", corsItem, async (req, res) => {
   const productService = await createProductService();
@@ -112,13 +96,7 @@ router.get("/", async (req, res) => {
     });
   
     if(!req.headers['accept'] || req.headers['accept'] === 'application/json') {
-      const resource = new ResourceCollection(products, {
-        paginationData: {
-            total,
-            page: parseInt(page as string),
-            limit: parseInt(limit as string),
-          },
-      })
+      const resource = new ProductResourceCollection(products, req)
       res.json(resource.toJson());
     }
   if(req.headers['accept'] === 'text/csv') {

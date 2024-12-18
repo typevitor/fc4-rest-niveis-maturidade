@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createCategoryService } from '../services/category.service';
-import { Resource, ResourceCollection } from '../http/Resource';
+import { Resource, ResourceCollection } from '../http/resource';
 
 const router = Router();
 

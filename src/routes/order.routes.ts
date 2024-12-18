@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createOrderService } from '../services/order.service';
-import { Resource, ResourceCollection } from '../http/Resource';
+import { Resource, ResourceCollection } from '../http/resource';
 
 const router = Router();
 
@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
     const customerId = req.userId;
     const { order, payment } = await orderService.createOrder({customerId, payment_method, card_token, cart_uuid});
     const resource = new Resource({order, payment}, {
-    _links: {
+    links: {
         self: {
             href: `/orders/${order.id}`,
             method: 'GET',

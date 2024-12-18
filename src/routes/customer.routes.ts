@@ -2,7 +2,7 @@ import { Router } from "express";
 import { createCustomerService } from "../services/customer.service";
 import { CreateCustomerDto } from "../validations/customer.validations";
 import { validateSync } from "class-validator";
-import { Resource } from "../http/Resource";
+import { Resource } from "../http/resource";
 import { ValidationError } from "../errors";
 
 const router = Router();
