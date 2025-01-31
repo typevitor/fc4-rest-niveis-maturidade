@@ -79,8 +79,8 @@ Content-Type: application/json
 Authorization: Bearer {{ token }}
 
 {
-  "name": "Category Name",
-  "slug": "category-slug"
+  "name": "Category Name 2",
+  "slug": "category-slug 2"
 }
 
 ###
