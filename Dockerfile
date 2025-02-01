@@ -3,7 +3,7 @@ FROM node:22.8.0-slim
 COPY start.sh /
 RUN chmod +x /start.sh
 
-RUN groupmod -g 1001 node && usermod -u 1001 -g 1001 node
+#RUN groupmod -g 1001 node && usermod -u 1001 -g 1001 node
 
 USER node
 
