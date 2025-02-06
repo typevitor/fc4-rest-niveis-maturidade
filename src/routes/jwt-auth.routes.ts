@@ -4,6 +4,7 @@ import { createDatabaseConnection } from "../database";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import { defaultCorsOptions } from "../http/cors";
+import { responseCached } from "../http/response-cached";
 
 const router = Router();
 
@@ -39,8 +40,12 @@ router.get("/me", corsItem, async (req, res) => {
     where: {
       id: userId},
   });
-  res.set("Cache-Control", "private, max-age=30"); //Em segundos
-  res.send(user);
+  return responseCached(
+    {res, body: user}, {
+    maxAge: 60,
+    type: "private",
+    revalidate: "must-revalidate"
+  })
 });
 
 router.options("/me", corsItem);

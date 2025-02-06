@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createProductService } from "../services/product.service";
 import { Resource, ResourceCollection } from "../http/resource";
+import { responseCached } from "../http/response-cached";
 
 const router = Router();
 
@@ -39,7 +40,12 @@ router.get("/", async (req, res) => {
         limit: parseInt(limit as string),
       },
   })
-  res.json(resource.toJson());
+  return responseCached(
+    {res, body: resource.toJson()}, {
+    maxAge: 60,
+    type: "private",
+    revalidate: "must-revalidate"
+  });
 });
 
 export default router;

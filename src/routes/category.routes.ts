@@ -3,6 +3,7 @@ import { createCategoryService } from "../services/category.service";
 import { Resource, ResourceCollection } from "../http/resource";
 import cors from "cors";
 import { defaultCorsOptions } from "../http/cors";
+import { responseCached } from "../http/response-cached";
 
 const router = Router();
 
@@ -40,8 +41,12 @@ router.get("/", corsCollection, async (req, res) => {
       limit: parseInt(limit as string),
     },
   });
-  res.set("Cache-Control", "max-age=30"); //Em segundos
-  res.json(resource.toJson());
+  return responseCached(
+    {res, body: resource.toJson()}, {
+    maxAge: 60,
+    type: "public",
+    revalidate: "must-revalidate"
+  });
 });
 
 router.options("/", corsCollection);
